@@ -2,18 +2,21 @@ use crate::middleware::auth;
 use crate::middleware::log;
 use crate::router::auth_router::*;
 use crate::router::draft::*;
+use crate::router::task_router::create_task;
 use axum::{Extension, Router, middleware, routing};
+use sea_orm::DatabaseConnection;
 use tower_http::cors::{self, Any};
 
 mod auth_router;
 mod draft;
+mod task_router;
 
 #[derive(Clone)]
 pub struct SharedData {
     pub message: String,
 }
 
-pub fn create_routers() -> Router {
+pub fn create_routers(db: DatabaseConnection) -> Router {
     let cors: cors::CorsLayer = cors::CorsLayer::new().allow_headers(Any).allow_methods(Any);
     let shared_data = SharedData {
         message: "heheh".to_string(),
@@ -27,8 +30,10 @@ pub fn create_routers() -> Router {
         .route("/share", routing::get(get_shared_data))
         .route("/auth", routing::post(register))
         .route("/auth/v2", routing::post(registerv2))
+        .route("/task", routing::post(create_task))
         .layer(cors)
         .layer(Extension(shared_data))
+        .layer(Extension(db))
         .layer(middleware::from_fn(log::log_middleware));
     //.layer(middleware::from_fn(auth::auth_middleware));
 }

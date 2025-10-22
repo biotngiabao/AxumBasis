@@ -1,29 +1,27 @@
-use std::sync::Arc;
-
-use axum::{Extension, Router};
 mod middleware;
 mod router;
 mod dto;
-use dotenvy;
-use sea_orm::{Database, DatabaseConnection};
-mod entities;
+pub mod domain;
+pub mod common;
 
-pub struct AppState {
-    pub db: DatabaseConnection,
-}
+use dotenvy;
+use sea_orm::{ DatabaseConnection };
+mod entities;
+mod app;
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     dotenvy::dotenv().ok();
 
-    let db_url = std::env::var("DATABASE_URL").unwrap();
-    let db = Database::connect(db_url).await.unwrap();
-
-    //let state = Arc::new(db);
-    let app: Router = router::create_routers(db);
+    let config = common::config::Config::from_env()?;
+    let db: DatabaseConnection = common::db::setup_database(&config).await?;
+    let state = common::bootstap::AppState::build(config, db);
+    let app = app::create_routers(state);
     let address: String = format!("0.0.0.0:{}", 8080);
     let listener: tokio::net::TcpListener = tokio::net::TcpListener::bind(&address).await.unwrap();
 
     println!("Server is running on {address}");
     axum::serve(listener, app).await.unwrap();
+
+    return Ok(());
 }

@@ -2,5 +2,6 @@
 
 pub mod prelude;
 
+pub mod post;
 pub mod tasks;
 pub mod users;

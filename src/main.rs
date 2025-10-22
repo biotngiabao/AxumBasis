@@ -3,6 +3,7 @@ use std::sync::Arc;
 use axum::{Extension, Router};
 mod middleware;
 mod router;
+mod dto;
 use dotenvy;
 use sea_orm::{Database, DatabaseConnection};
 mod entities;

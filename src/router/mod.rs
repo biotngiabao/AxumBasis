@@ -2,14 +2,16 @@ use crate::middleware::auth;
 use crate::middleware::log;
 use crate::router::auth_router::*;
 use crate::router::draft::*;
-use crate::router::task_router::create_task;
-use axum::{Extension, Router, middleware, routing};
+use crate::router::task_router::*;
+use axum::http::method;
+use axum::{ Extension, Router, middleware, routing };
 use sea_orm::DatabaseConnection;
-use tower_http::cors::{self, Any};
+use tower_http::cors::{ self, Any };
 
 mod auth_router;
 mod draft;
 mod task_router;
+use crate::dto;
 
 #[derive(Clone)]
 pub struct SharedData {
@@ -28,9 +30,11 @@ pub fn create_routers(db: DatabaseConnection) -> Router {
         .route("/body/json", routing::post(get_body_json))
         .route("/header", routing::get(get_header))
         .route("/share", routing::get(get_shared_data))
-        .route("/auth", routing::post(register))
-        .route("/auth/v2", routing::post(registerv2))
+        .route("/auth/register", routing::post(register))
         .route("/task", routing::post(create_task))
+        .route("/task/{id}", routing::get(get_task_by_id))
+        .route("/task", routing::get(get_all_tasks))
+        .route("/auth/login", routing::post(login))
         .layer(cors)
         .layer(Extension(shared_data))
         .layer(Extension(db))

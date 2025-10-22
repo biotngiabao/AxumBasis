@@ -11,19 +11,11 @@ pub struct Model {
     pub username: String,
     pub password: String,
     pub deleted_at: Option<DateTimeWithTimeZone>,
-    pub token: Option<String>,
+    #[sea_orm(unique)]
+    pub email: String,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
-pub enum Relation {
-    #[sea_orm(has_many = "super::tasks::Entity")]
-    Tasks,
-}
-
-impl Related<super::tasks::Entity> for Entity {
-    fn to() -> RelationDef {
-        Relation::Tasks.def()
-    }
-}
+pub enum Relation {}
 
 impl ActiveModelBehavior for ActiveModel {}

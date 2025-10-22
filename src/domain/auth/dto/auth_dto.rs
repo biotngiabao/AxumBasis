@@ -1,13 +1,6 @@
-use axum::{ Json, extract::{ FromRequest, Extension }, http::StatusCode };
-use bcrypt::{ bcrypt, verify, DEFAULT_COST };
-use sea_orm::{ ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter };
-use serde::de::DeserializeOwned;
+
 use serde::{ Deserialize, Serialize };
 use validator::Validate;
-use crate::dto::response::ApiResponse;
-use sea_orm::DatabaseConnection;
-
-use crate::entities::users;
 
 #[derive(Clone, Deserialize, Validate)]
 pub struct RegisterDto {

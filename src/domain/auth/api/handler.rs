@@ -1,8 +1,9 @@
 use axum::{ extract::{ State }, http::StatusCode, Json };
 
-use crate::{ domain::auth::dto::auth_dto::*, dto::response::ApiResponse };
+use crate::{ domain::auth::dto::auth_dto::* };
 use crate::common::bootstap::AppState;
 use crate::common::extractor::ValidatedJson;
+use crate::common::response::ApiResponse;
 
 pub async fn register(
     State(app_state): State<AppState>,

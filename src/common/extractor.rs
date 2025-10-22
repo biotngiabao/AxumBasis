@@ -1,7 +1,7 @@
 use axum::{ Json, extract::{ FromRequest }, http::StatusCode };
 use serde::de::DeserializeOwned;
 use validator::Validate;
-use crate::dto::response::ApiResponse;
+use crate::common::response::ApiResponse;
 
 pub struct ValidatedJson<T>(pub T);
 impl<B, T> FromRequest<B>

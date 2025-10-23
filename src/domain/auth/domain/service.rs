@@ -1,22 +1,21 @@
-use sea_orm::{ ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter };
-use crate::domain::auth::dto::auth_dto::{ LoginDto, RegisterDto, UserResponse };
-use bcrypt::{ verify, DEFAULT_COST };
+use crate::domain::auth::{
+    dto::auth_dto::{LoginDto, RegisterDto, UserResponse},
+    infra::repo::AuthRepo,
+};
 use crate::entities::users;
+use bcrypt::{DEFAULT_COST, verify};
+use std::sync::Arc;
 
-#[derive(Clone)]
 pub struct AuthService {
-    pub db: DatabaseConnection,
+    pub auth_repo: AuthRepo,
 }
 
 impl AuthService {
-    pub fn new(db: DatabaseConnection) -> Self {
-        Self { db }
+    pub fn new(auth_repo: AuthRepo) -> Arc<Self> {
+        Arc::new(Self { auth_repo })
     }
     pub async fn register(&self, payload: RegisterDto) -> Result<UserResponse, String> {
-        let find_user = users::Entity
-            ::find()
-            .filter(users::Column::Email.eq(payload.email.clone()))
-            .one(&self.db).await;
+        let find_user = self.auth_repo.get_user_by_email(&payload.email).await;
 
         if let Ok(Some(_)) = find_user {
             return Err("Email already in use".to_string());
@@ -37,22 +36,18 @@ impl AuthService {
             ..Default::default()
         };
 
-        match new_user.insert(&self.db).await {
-            Ok(user) =>
-                Ok(UserResponse {
-                    id: user.id,
-                    username: user.username,
-                    email: user.email,
-                }),
+        match self.auth_repo.create_user(new_user).await {
+            Ok(user) => Ok(UserResponse {
+                id: user.id,
+                username: user.username,
+                email: user.email,
+            }),
             Err(err) => Err(err.to_string()),
         }
     }
 
     pub async fn login(&self, payload: LoginDto) -> Result<UserResponse, String> {
-        let result = users::Entity
-            ::find()
-            .filter(users::Column::Email.eq(payload.email))
-            .one(&self.db).await;
+        let result = self.auth_repo.get_user_by_email(&payload.email).await;
 
         let user = match result {
             Ok(Some(user)) => user,

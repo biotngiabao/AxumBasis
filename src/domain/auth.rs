@@ -9,3 +9,6 @@ pub mod dto {
 pub mod domain {
     pub mod service;
 }
+pub mod infra {
+    pub mod repo;
+}

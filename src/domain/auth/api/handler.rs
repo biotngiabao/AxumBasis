@@ -1,13 +1,14 @@
-use axum::{ extract::{ State }, http::StatusCode, Json };
+use axum::{Json, extract::State, http::StatusCode};
 
-use crate::{ domain::auth::dto::auth_dto::* };
 use crate::common::bootstap::AppState;
 use crate::common::extractor::ValidatedJson;
 use crate::common::response::ApiResponse;
+use crate::domain::auth::dto::auth_dto::*;
+use std::sync::Arc;
 
 pub async fn register(
-    State(app_state): State<AppState>,
-    ValidatedJson(payload): ValidatedJson<RegisterDto>
+    State(app_state): State<Arc<AppState>>,
+    ValidatedJson(payload): ValidatedJson<RegisterDto>,
 ) -> (StatusCode, Json<ApiResponse<UserResponse>>) {
     let result = app_state.auth_service.register(payload).await;
     match result {
@@ -17,8 +18,8 @@ pub async fn register(
 }
 
 pub async fn login(
-    State(app_state): State<AppState>,
-    ValidatedJson(payload): ValidatedJson<LoginDto>
+    State(app_state): State<Arc<AppState>>,
+    ValidatedJson(payload): ValidatedJson<LoginDto>,
 ) -> (StatusCode, Json<ApiResponse<UserResponse>>) {
     let result = app_state.auth_service.login(payload).await;
     match result {

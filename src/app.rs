@@ -1,18 +1,14 @@
-use axum::{ Router};
 use crate::common::bootstap::AppState;
-use crate::{ domain::auth };
+use crate::domain::auth;
+use axum::Router;
+use std::sync::Arc;
 
-pub fn create_routers(state: AppState) -> Router {
-    let cors = tower_http::cors::CorsLayer
-        ::new()
+pub fn create_routers(state: Arc<AppState>) -> Router {
+    let cors = tower_http::cors::CorsLayer::new()
         .allow_headers(tower_http::cors::Any)
         .allow_methods(tower_http::cors::Any);
 
-
-
-    let auth_router = Router::new()
-        .nest("/auth", auth::api::router::auth_handler());
-
+    let auth_router = Router::new().nest("/auth", auth::api::router::auth_handler());
 
     return Router::new()
         .merge(auth_router)
@@ -20,4 +16,3 @@ pub fn create_routers(state: AppState) -> Router {
         .layer(cors)
         .with_state(state);
 }
-

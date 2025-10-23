@@ -1,6 +1,5 @@
 pub mod common;
 pub mod domain;
-mod router;
 
 use dotenvy;
 use sea_orm::DatabaseConnection;

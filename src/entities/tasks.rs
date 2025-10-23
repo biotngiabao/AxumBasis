@@ -13,7 +13,7 @@ pub struct Model {
     #[sea_orm(column_type = "Text", nullable)]
     pub description: Option<String>,
     pub deleted_at: Option<DateTimeWithTimeZone>,
-    pub user_id: Option<i32>,
+    pub user_id: i32,
     pub is_default: Option<bool>,
 }
 

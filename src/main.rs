@@ -1,11 +1,16 @@
 use std::sync::Arc;
 
-use axum::{Extension, Router};
-mod middleware;
-mod router;
+use axum::Router;
+mod common;
 mod dto;
+pub mod extractor;
+mod middleware;
+pub mod response;
+mod router;
 use dotenvy;
 use sea_orm::{Database, DatabaseConnection};
+
+use crate::common::config;
 mod entities;
 
 pub struct AppState {
@@ -13,11 +18,9 @@ pub struct AppState {
 }
 
 #[tokio::main]
-async fn main() {
-    dotenvy::dotenv().ok();
-
-    let db_url = std::env::var("DATABASE_URL").unwrap();
-    let db = Database::connect(db_url).await.unwrap();
+async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    let config = config::Config::from_env()?;
+    let db = config::setup_database(&config).await?;
 
     //let state = Arc::new(db);
     let app: Router = router::create_routers(db);
@@ -26,4 +29,6 @@ async fn main() {
 
     println!("Server is running on {address}");
     axum::serve(listener, app).await.unwrap();
+
+    Ok(())
 }

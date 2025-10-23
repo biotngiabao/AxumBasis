@@ -1,5 +1,5 @@
-use serde::{ Serialize };
-use axum::{ http::StatusCode, response::Json };
+use axum::{http::StatusCode, response::Json};
+use serde::Serialize;
 
 #[derive(Serialize)]
 pub struct ApiResponse<T> {

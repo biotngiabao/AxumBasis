@@ -1,17 +1,15 @@
 use crate::middleware::auth;
 use crate::middleware::log;
 use crate::router::auth_router::*;
-use crate::router::draft::*;
+use crate::router::draft_router::*;
 use crate::router::task_router::*;
-use axum::http::method;
-use axum::{ Extension, Router, middleware, routing };
+use axum::{Extension, Router, middleware, routing};
 use sea_orm::DatabaseConnection;
-use tower_http::cors::{ self, Any };
+use tower_http::cors::{self, Any};
 
 mod auth_router;
-mod draft;
+mod draft_router;
 mod task_router;
-use crate::dto;
 
 #[derive(Clone)]
 pub struct SharedData {

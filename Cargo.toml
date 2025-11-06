@@ -19,5 +19,23 @@ dotenvy = "0.15.7"
 bcrypt = "0.17.1"
 anyhow = "1.0.100"
 
+tonic = { version = "0.12", features = ["transport", "gzip"] }
+prost = "0.13"
+prost-types = "0.13"
+tonic-reflection = "0.12"
+
+[build-dependencies]
+tonic-build = "0.12"
+
+
 [workspace]
 members = [".", "migration"]
+
+
+# [[bin]]
+# name = "server"
+# path = "src/server.rs"
+
+# [[bin]]
+# name = "client"
+# path = "src/client.rs"

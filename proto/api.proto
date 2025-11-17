@@ -258,16 +258,6 @@ service HeraXService {
 
     // Dimensionality Reduction
     rpc DimredPCA(DimredPCARequest) returns (DimredPCAResponse);
-    rpc DimredSCVI(DimredSCVIRequest) returns (DimredSCVIResponse);
-    rpc DimredTsne(DimredTsneRequest) returns (DimredTsneResponse);
-    rpc DimredUmap(DimredUmapRequest) returns (DimredUmapResponse);
-
-    // Clustering
-    rpc ClusteringLouvain(ClusteringLouvainRequest) returns (ClusteringLouvainResponse);
-    rpc ClusteringLeiden(ClusteringLeidenRequest) returns (ClusteringLeidenResponse);
-    rpc ClusteringKmeans(ClusteringKmeansRequest) returns (ClusteringKmeansResponse);
-
-    // Differential Expression
-    rpc DiffexpTTest(DiffexpTTestRequest) returns (DiffexpTTestResponse);
+    
 
 }

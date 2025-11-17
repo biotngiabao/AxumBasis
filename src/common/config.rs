@@ -9,11 +9,16 @@ pub struct GprcServer {
     pub host: String,
     pub port: u16,
 }
+pub struct GprcClient {
+    pub host: String,
+    pub port: u16,
+}
 
 pub struct Config {
     pub database_url: String,
     pub server: Server,
     pub grpc_server: GprcServer,
+    pub grpc_client: GprcClient,
 }
 
 impl Config {
@@ -25,16 +30,24 @@ impl Config {
         let grpc_host = std::env::var("GRPC_HOST")?;
         let grpc_port = std::env::var("GRPC_PORT")?.parse::<u16>().unwrap();
 
+        let grpc_server_host = std::env::var("GRPC_SERVER_HOST")?;
+        let grpc_server_port = std::env::var("GRPC_SERVER_PORT")?.parse::<u16>().unwrap();
+
         let server = Server { host, port };
         let grpc_server = GprcServer {
             host: grpc_host,
             port: grpc_port,
+        };
+        let grpc_client = GprcClient {
+            host: grpc_server_host,
+            port: grpc_server_port,
         };
 
         Ok(Config {
             database_url,
             server,
             grpc_server,
+            grpc_client,
         })
     }
 }

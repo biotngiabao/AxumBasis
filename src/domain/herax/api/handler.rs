@@ -1,7 +1,11 @@
+use axum::body;
 use axum::extract::State;
 use axum::{Json, http::StatusCode};
 
+use crate::app;
 use crate::common::bootstap::AppState;
+use crate::common::proto;
+// use crate::common::proto::*;
 use crate::common::response::ApiResponse;
 use crate::domain::herax::dto::ping_dto::*;
 
@@ -41,6 +45,37 @@ pub async fn get_server_info(
         }
         Err(err) => ApiResponse::error(
             &format!("Failed to ping: {}", err),
+            StatusCode::INTERNAL_SERVER_ERROR,
+        ),
+    }
+}
+
+pub async fn pca(
+    State(app_state): State<Arc<AppState>>,
+    Json(body): Json<PCARequest>,
+) -> (StatusCode, Json<ApiResponse<PCAResponse>>) {
+    match app_state
+        .grpc_client
+        .pca(body.file_path, body.stream, body.n_components)
+        .await
+    {
+        Ok(value) => match value {
+            proto::dimred_pca_response::Value::Data(data) => {
+                return ApiResponse::success(
+                    PCAResponse {
+                        dtypes: data.dtype,
+                        array_bytes: data.arr_bytes,
+                        shape: data.shape,
+                    },
+                    "PCA successfully",
+                );
+            }
+            (_) => {
+                return ApiResponse::error("Fail", StatusCode::CONFLICT);
+            }
+        },
+        Err(err) => ApiResponse::error(
+            &format!("Failed to pca: {}", err),
             StatusCode::INTERNAL_SERVER_ERROR,
         ),
     }

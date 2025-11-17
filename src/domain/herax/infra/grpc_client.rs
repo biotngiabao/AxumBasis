@@ -1,10 +1,11 @@
 use crate::common::proto;
 use crate::common::proto::hera_x_service_client::*;
 use anyhow::Ok;
+use tokio::stream;
 use tonic::transport::Channel;
 
 pub struct GprcClient {
-    client: HeraXServiceClient<Channel>,
+    pub client: HeraXServiceClient<Channel>,
 }
 
 impl GprcClient {
@@ -50,5 +51,31 @@ impl GprcClient {
         let response: proto::ErrorMsg = client.ping(request).await?.into_inner();
 
         return Ok(response);
+    }
+
+    pub async fn pca(
+        &self,
+        file_path: String,
+        stream: bool,
+        n_components: i32,
+    ) -> anyhow::Result<proto::dimred_pca_response::Value> {
+        let mut client = self.client.clone();
+        let request = tonic::Request::new(proto::DimredPcaRequest {
+            file: Some(proto::FileRequest {
+                file_path,
+                stream,
+                is_over_write: true,
+            }),
+            n_components,
+            batch: "".to_string(),
+            key_store: "X_pca".to_string(),
+        });
+
+        let response = client.dimred_pca(request).await?.into_inner();
+        let value = response
+            .value
+            .ok_or_else(|| anyhow::anyhow!("no value returned in pca"))?;
+
+        return Ok(value);
     }
 }
